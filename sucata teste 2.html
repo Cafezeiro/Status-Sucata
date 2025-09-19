@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Status Pátio de Sucatas</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1, h2 { text-align: center; margin: 3px 0; }
+    h1 { font-size: 18px; }
+    h2 { font-size: 16px; }
+    p { text-align: center; margin: 3px 0; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; margin: 5px 0; }
+    th, td { border: 1px solid #888; padding: 2px; text-align: center; font-size: 11px; }
+    th { background: #ddd; }
+    input { width: 95%; padding: 3px; text-align: center; border: 1px solid #aaa; font-size: 12px; border-radius: 4px; }
+    input.observacao { width: 98%; text-align: left; }
+    tr:nth-child(even) td { background: #fafafa; }
+    button { margin: 2px; padding: 5px 8px; border: none; border-radius: 4px; cursor: pointer; background: #4CAF50; color: white; font-size: 11px; }
+    button:hover { background: #45a049; }
+    .section { margin-top: 5px; }
+    .container { width: 95%; max-width: 500px; }
+
+    /* Cores diferentes nas colunas */
+    td input.dentro { background: #d0e7fc; }
+    td input.descarregado { background: #fce1d0; }
+    td input.patio { background: #d0f0c0; }
+
+    @media(max-width:600px){
+      th, td { font-size: 9px; }
+      input { font-size: 10px; padding: 2px; }
+      h1 { font-size: 16px; }
+      h2 { font-size: 13px; }
+      button { font-size: 10px; padding: 4px 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="printArea">
+    <h1>Status Pátio de Sucatas</h1>
+    <p><strong>Data Atual:</strong> <span id="dataHoje"></span> | <strong>D-1:</strong> <span id="dataOntem"></span></p>
+
+    <div id="tabela-container" class="section">
+      <h2>Tabela de Horários</h2>
+      <table id="tabela">
+        <thead>
+          <tr>
+            <th>Horário</th>
+            <th>Pátio G2L</th>
+            <th>Dentro da Usina</th>
+            <th>Descarregados</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>00h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>03h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>05h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>08h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>09h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>10h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>12h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>15h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>18h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>20h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+          <tr><td>22h</td><td><input type="number" min="0" class="dentro"></td><td><input type="number" min="0" class="descarregado"></td><td><input type="number" min="0" class="patio"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="d1-container" class="section">
+      <h2>Carros D-1</h2>
+      <table id="tabelaD1">
+        <thead>
+          <tr><th>Descrição</th><th>Qtd</th><th>Obs</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Descarregados</td><td><input type="number" min="0"></td><td><input type="text" class="observacao"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" style="text-align:center;">
+    <button id="btnLimparTabela" onclick="limparTabela()">Limpar Tabela</button>
+    <button id="btnLimparD1" onclick="limparD1()">Limpar D-1</button>
+    <button id="btnPrint" onclick="gerarPrint()">📸 Print</button>
+    <button id="btnSalvar" onclick="salvarRelatorio()">💾 Salvar Relatório</button>
+    <input type="file" id="fileInput" style="display:none;" accept=".json" onchange="carregarRelatorio(event)">
+    <button id="btnCarregar" onclick="document.getElementById('fileInput').click()">📂 Carregar Relatório</button>
+  </div>
+
+  <script>
+    const hoje = new Date();
+    const ontem = new Date(); ontem.setDate(hoje.getDate() - 1);
+    document.getElementById("dataHoje").textContent = hoje.toLocaleDateString("pt-BR");
+    document.getElementById("dataOntem").textContent = ontem.toLocaleDateString("pt-BR");
+
+    function limparTabela(){
+      document.querySelectorAll("#tabela tbody input").forEach(input => input.value = "");
+    }
+    function limparD1(){
+      document.querySelectorAll("#tabelaD1 tbody input").forEach(input => input.value = "");
+    }
+
+    function gerarPrint() {
+      const area = document.getElementById("printArea");
+
+      // Clonar a área para substituir inputs por spans
+      const clone = area.cloneNode(true);
+      clone.querySelectorAll("input").forEach(input => {
+        const span = document.createElement("span");
+        span.textContent = input.value || "";
+        span.style.display = "inline-block";
+        span.style.minWidth = input.type === "number" ? "30px" : "80px";
+        span.style.padding = "2px";
+        span.style.textAlign = input.style.textAlign || "center";
+        span.style.border = "1px solid #aaa";
+        span.style.borderRadius = "4px";
+        span.style.background = input.classList.contains("dentro") ? "#d0f0c0"
+                        : input.classList.contains("descarregado") ? "#fce1d0"
+                        : input.classList.contains("patio") ? "#d0e7fc"
+                        : "#fff";
+        span.style.fontSize = "12px";
+        input.replaceWith(span);
+      });
+
+      // Container temporário para captura
+      const tempDiv = document.createElement("div");
+      tempDiv.style.position = "absolute";
+      tempDiv.style.left = "-9999px";
+      tempDiv.appendChild(clone);
+      document.body.appendChild(tempDiv);
+
+      html2canvas(clone, { scale: 3, useCORS: true, backgroundColor: "#fff" }).then(canvas => {
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = "status_patio_sucatas.png";
+        link.click();
+        document.body.removeChild(tempDiv);
+      }).catch(err => {
+        console.error("Erro ao gerar print:", err);
+        alert("Erro ao gerar print. Veja o console para detalhes.");
+        document.body.removeChild(tempDiv);
+      });
+    }
+
+    // Função para salvar em JSON
+    function salvarRelatorio() {
+      let dados = { tabela: [], d1: [] };
+
+      // Captura da Tabela principal
+      document.querySelectorAll("#tabela tbody tr").forEach(tr => {
+        let linha = [];
+        tr.querySelectorAll("input").forEach(input => linha.push(input.value));
+        dados.tabela.push(linha);
+      });
+
+      // Captura da Tabela D1
+      document.querySelectorAll("#tabelaD1 tbody tr").forEach(tr => {
+        let linha = [];
+        tr.querySelectorAll("input").forEach(input => linha.push(input.value));
+        dados.d1.push(linha);
+      });
+
+      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "relatorio_sucatas.json";
+      link.click();
+    }
+
+    // Função para carregar JSON
+    function carregarRelatorio(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const dados = JSON.parse(e.target.result);
+
+          // Preenche tabela principal
+          document.querySelectorAll("#tabela tbody tr").forEach((tr, i) => {
+            const valores = dados.tabela[i] || [];
+            tr.querySelectorAll("input").forEach((input, j) => input.value = valores[j] || "");
+          });
+
+          // Preenche tabela D1
+          document.querySelectorAll("#tabelaD1 tbody tr").forEach((tr, i) => {
+            const valores = dados.d1[i] || [];
+            tr.querySelectorAll("input").forEach((input, j) => input.value = valores[j] || "");
+          });
+
+          alert("Relatório carregado com sucesso!");
+        } catch (err) {
+          alert("Erro ao carregar relatório: " + err.message);
+          console.error(err);
+        }
+      };
+      reader.readAsText(file);
+    }
+  </script>
+
+</body>
+</html>
